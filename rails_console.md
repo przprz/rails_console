@@ -58,7 +58,7 @@ ClaimPayout.find(104980, 1, :i_am_not_here)
 ## CRUD: Read 
 
 #### `find_by()`
-`.find_by(name: 'Andrzej')` - find **one record** by some other attribute (may return nil)
+`.find_by(name: 'Andżej')` - find **one record** by some other attribute (may return nil)
 
 
 ```
