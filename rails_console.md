@@ -54,11 +54,14 @@ Simplest methods:
 ## CRUD: Read 
 
 #### `find_by()`
-`.find_by(name: 'Andrzej')` - find **one record** by some other attribute
+`.find_by(name: 'Andrzej')` - find **one record** by some other attribute (may return nil)
 
 Example
  
 * `ClaimPayout.find_by(claim_enquiry_id: 178849,) # hey i'm a comment, and there's a comma after the id`
+
+#### Note
+It will return the **first** record matching the criteria.
 
 ---
 
