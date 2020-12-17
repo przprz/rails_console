@@ -195,7 +195,7 @@ ClaimPayout.joins(:claim_enquiry)
 ```
 
 ##### Note
-* we need to pass singular form to model, but plural (i.e. the same that the DB uses) to the `where()` method.
+* we need to pass singular form to `joins()`, but plural (i.e. the same that the DB uses) to the `where()` method.
 
 ---
 
@@ -209,6 +209,17 @@ ClaimPayout.joins(:claim_enquiry)
 ClaimPayout.where(selected_payout_option: 'credit_card_transfer').to_sql
 
 => "SELECT \"claim_payouts\".* FROM \"claim_payouts\" WHERE \"claim_payouts\".\"selected_payout_option\" = 'credit_card_transfer'"
+```
+
+---
+
+## CRUD: Read
+
+Finally, we can run arbitrary SQL with
+
+```
+sql = "select * from ... your sql query here"
+ActiveRecord::Base.connection.execute(sql)
 ```
 
 ---
