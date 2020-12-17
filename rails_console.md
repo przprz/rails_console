@@ -35,7 +35,9 @@ Simplest methods:
 #### `find()`
 `.find(id)` - find **one record** by id, may throw AR::RecordNotFound 
 
-*  `ClaimPayout.find(104980)`
+```
+ClaimPayout.find(104980)
+```
 
 
 
@@ -44,9 +46,11 @@ Simplest methods:
 `.find([id1, id2, id3])` - same as above but array passed
 
  
-* `ClaimPayout.find(104980, 1)`
+```
+ClaimPayout.find(104980, 1)
 
-* `ClaimPayout.find(104980, 1, :i_am_not_here)`
+ClaimPayout.find(104980, 1, :i_am_not_here)
+```
 
 
 ---
@@ -56,9 +60,10 @@ Simplest methods:
 #### `find_by()`
 `.find_by(name: 'Andrzej')` - find **one record** by some other attribute (may return nil)
 
-Example
 
-* `ClaimPayout.find_by(claim_enquiry_id: 178849,) # hey i'm a comment, and there's a comma after the id`
+```
+ClaimPayout.find_by(claim_enquiry_id: 178849,) # hey i'm a comment, and there's a comma after the id
+```
 
 #### Note
 It will return the **first** record matching the criteria.
@@ -69,8 +74,8 @@ It will return the **first** record matching the criteria.
 
 Note: all the above methods return *instances* of objects or *arrays of instances*:
 
-* `ClaimPayout.find_by(claim_enquiry_id: 178849,).class`
 ```
+> ClaimPayout.find_by(claim_enquiry_id: 178849,).class
 class ClaimPayout < ApplicationRecord {
                           :id => :integer,
             :claim_enquiry_id => :integer,
@@ -83,8 +88,8 @@ class ClaimPayout < ApplicationRecord {
 }
 ```
 
-* `ClaimPayout.take(3).class`
 ```
+> ClaimPayout.take(3).class
 Array < Object
 ```
 
@@ -96,32 +101,35 @@ It means that they can't be chained. But the methods from next slides can!
 
 #### `where()`
 
-`where()` returns *ActiveRecord::Relation* and can be **chained** and **negated**, and **interpolate** arguments
-
 `.where(attribute_name: :some_value)` - finds **many records** (watch out - may return loooooong output)
 
 `.where(attribute_name: :some_value, other_attribute: :other_value)` - `where` can be used with many attributes
 
-Example
+`.where(attribute_name: [:some_value, :some_other_value])` - `where` can be used with array of values
+
+`.where("id < ?", computed_array_of_values(some_params))` - you can interpolate argument(s) with `where` 
+
  
-*  ```ClaimPayout.where       :selected_payout_option => "credit_card_transfer"```
+```
+ClaimPayout.where       :selected_payout_option => "credit_card_transfer"
+
+ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_transfer"])
+```
  
 ---
 
 ## CRUD: Read 
 
-* ```ClaimPayout.where("id < ?", 200).class # ClaimPayout::ActiveRecord_Relation < ActiveRecord::Relation```
+`where()` returns *ActiveRecord::Relation* and can be **chained** and **negated**
 
 ```
-  ClaimPayout.where("id < ?", 200)
-    .where.not(:selected_payout_option => "credit_card_transfer")
-```
+Claim.where("id < ?", 9).class # Claim::ActiveRecord_Relation < ActiveRecord::Relation
 
-```
-  ClaimPayout.where("id < ?", Calculator.calculate_ids()) # we can pass it a method to generate criteria
-```
-```
- ClaimPayout.where("created_at > ?", 3.days.ago).pluck(:selected_payout_option).sort.uniq # useful with dates
+ClaimPayout.where("id < ?", 200).where.not(:selected_payout_option => "credit_card_transfer")
+
+ClaimPayout.where("id < ?", Calculator.calculate_ids()) # we can pass it a method to generate criteria
+
+ClaimPayout.where("created_at > ?", 3.days.ago).pluck(:selected_payout_option).sort.uniq # useful with dates
 ```
 
 ---
@@ -152,11 +160,15 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 ##### `.pluck()`
 `.pluck(:name)` - get 'name' attribute from all records in a collection 
 
-* `ClaimPayout.where("created_at>?",3.days.ago).pluck(:selected_payout_option)` - find which payout options clients used recently
+```
+ClaimPayout.where("created_at>?",3.days.ago).pluck(:selected_payout_option) # find which payout options clients used recently
+```
 
-##### `.limit()`
+##### `.limit()` - retrieve only a portion of records
 
-* `ClaimPayout.where("created_at>?",3.days.ago).limit(10)`
+```
+ClaimPayout.where("created_at>?",3.days.ago).limit(10)
+```
 
 ---
 
@@ -167,7 +179,9 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 
 `.order(attribute_name: :desc)` 
 
-* `ClaimPayout.where("created_at>?",3.days.ago).order(collected_at: :desc)`
+```
+ClaimPayout.where("created_at>?",3.days.ago).order(collected_at: :desc)
+```
 
 ---
 
@@ -201,7 +215,7 @@ ClaimPayout.joins(:claim_enquiry)
 
 ## CRUD: Read
 
-`to_sql()`
+`to_sql()` - turn the AR query into a SQL query
 
 * Use case: we want to run a SQL query in prod, but we don't speak SQL 😔
 
@@ -255,7 +269,7 @@ The bang versions (e.g. `update!`) raise an exception if the record is invalid.
 
 There are **many other methods for updating** records. 
 
-* Here's a neat cheat-sheet https://makandracards.com/makandra/42641-different-ways-to-set-attributes-in-activerecord
+There's a neat cheat-sheet here https://makandracards.com/makandra/42641-different-ways-to-set-attributes-in-activerecord
 
 You can choose more exotic one depending on your use case (like: you need to skip validations, callbacks, etc.)
 
@@ -297,7 +311,7 @@ Pinger.new.ping!('true')
 
 * we can search for methods
 ```
-  ClaimPayout.first.methods.grep /_at$/ # find 'timestamp' methods of the object, like :created_at, :collected_at, etc. 
+ClaimPayout.first.methods.grep /_at$/ # find 'timestamp' methods of the object, like :created_at, :collected_at, etc. 
 ```
 
 * or even display the source code
