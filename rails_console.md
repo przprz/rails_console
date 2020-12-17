@@ -21,7 +21,7 @@ github.com/przprz/rails_console
 # Playing around
 ```ruby
 class Pinger
-  def ping!(patch)
+  def ping!(patch=false)
     # if patch
     #   puts :pong 
     #   return
@@ -31,6 +31,7 @@ class Pinger
 end 
 
 Pinger.new.ping!
+Pinger.new.ping!('true')
 ```
 
 * searching for methods
