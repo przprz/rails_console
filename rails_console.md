@@ -343,12 +343,12 @@ We'll need to look for awesome_print in AirHelp/dockerfiles repo
 
 # Keyboard shortcuts
 
-##### Most *readline* shortcuts are supported
+Most **readline** shortcuts are supported
 ###### TIP: many other applications also support some of these (try in your browser)
 
 * tab - autocompletion
 
-* ctrl+l - `clear` screen
+* ctrl+l - `clear` screen # so you don't need to type `clear` anymore
 
 * ctrl+p/ctrl+n - show previous/next command (but it acts weirdly via ssh)
 
@@ -375,9 +375,9 @@ We'll need to look for awesome_print in AirHelp/dockerfiles repo
 
 # Tips
 
-`$ rails console -e production --sandbox` - when you quit your session everything is rolled back!
+`$ rails console -e production --sandbox` - when you quit `sandbox` session everything is rolled back! #safety
 
-`$ rails console -- --nomultiline` - use `nomultiline` if you need to paste some long code (e.g. when monkey-patching)
+`$ rails console -- --nomultiline` - use `nomultiline` if you need to paste some long code #monkey-patching
 
 ```reload!``` - loads latest version of code (clears monkey-patches)
 
