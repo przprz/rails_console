@@ -411,12 +411,7 @@ Most **readline** shortcuts are supported
 
 Rails console uses `irb` by default https://github.com/ruby/irb
 
-Try `pry` https://github.com/pry/pry 
-
-```ruby
-# Gemfile
-gem 'pry-rails', :group => :development
-```
+Try `pry` https://github.com/pry/pry:
 
 * Source code browsing (including core C source with the pry-doc gem), documentation browsing
 * Navigation around state (cd, ls and friends)
@@ -425,6 +420,11 @@ gem 'pry-rails', :group => :development
 * Runtime invocation (use Pry as a developer console or debugger)
 * Ability to view and replay history, and many, many more...
 
+
+```ruby
+# Gemfile
+gem 'pry-rails', :group => :development
+```
 ---
 
 # Links
