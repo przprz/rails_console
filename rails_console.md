@@ -294,15 +294,14 @@ ClaimPayout.where(selected_payout_option: 'credit_card_transfer')
 class Pinger
   def ping!(patch=false)
     # if patch
-    #   puts :pong 
-    #   return
+    #   return :pong 
     # end
-    puts :ping
+    :ping
   end 
 end 
 
-Pinger.new.ping!
-Pinger.new.ping!('true')
+Pinger.new.ping! # => :ping
+Pinger.new.ping!('true') # => ?
 ```
 
 ---
