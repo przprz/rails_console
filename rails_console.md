@@ -164,14 +164,14 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 `.pluck(:name)` - get 'name' attribute from all records in a collection 
 
 ```ruby
-ClaimPayout.where("created_at>?",3.days.ago)
+ClaimPayout.where("created_at>?", 3.days.ago)
   .pluck(:selected_payout_option).sort.uniq # find which payout options clients used recently
 ```
 
 ##### `.limit()` - retrieve only a portion of records
 
 ```ruby
-ClaimPayout.where("created_at>?",3.days.ago).limit(10)
+ClaimPayout.where("created_at>?", 3.days.ago).limit(10)
 ```
 
 ---
@@ -184,7 +184,7 @@ ClaimPayout.where("created_at>?",3.days.ago).limit(10)
 `.order(attribute_name: :desc)` 
 
 ```ruby
-ClaimPayout.where("created_at>?",3.days.ago).order(collected_at: :desc)
+ClaimPayout.where("created_at>?", 3.days.ago).order(collected_at: :desc)
 ```
 
 ---
