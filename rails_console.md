@@ -74,7 +74,7 @@ It will return the **first** record matching the criteria.
 
 Note: all the above methods return *instances* of objects or *arrays of instances*:
 
-```
+```ruby
 > ClaimPayout.find_by(claim_enquiry_id: 178849,).class
 class ClaimPayout < ApplicationRecord {
                           :id => :integer,
@@ -101,13 +101,13 @@ It means that they can't be chained. But the methods from next slides can!
 
 #### `where()`
 
-`.where(attribute_name: :some_value)` - finds **many records** (watch out - may return loooooong output)
+`.where(city: 'Ulaanbaatar')` - finds **many records** (watch out - may return loooooong output)
 
-`.where(attribute_name: :some_value, other_attribute: :other_value)` - `where` can be used with many attributes
+`.where(continent: 'Africa', hemisphere: 'southern')` - `where` can be used with many attributes
 
-`.where(attribute_name: [:some_value, :some_other_value])` - `where` can be used with array of values
+`.where(gender: %w[ L G B T Q H ])` - `where` can be used with array of values
 
-`.where("id < ?", computed_array_of_values(some_params))` - you can interpolate argument(s) with `where` 
+`.where("id < ?", computed_array_of_values(some_params))` - you can **interpolate argument(s)** with `where` 
 
  
 ```ruby
@@ -115,7 +115,7 @@ ClaimPayout.where       :selected_payout_option => "credit_card_transfer"
 
 ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_transfer"])
 ```
- 
+
 ---
 
 ## CRUD: Read 
@@ -124,13 +124,18 @@ ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_tr
 
 ```ruby
 Claim.where("id < ?", 9).class # Claim::ActiveRecord_Relation < ActiveRecord::Relation
-
-ClaimPayout.where("id < ?", 200).where.not(:selected_payout_option => "credit_card_transfer")
-
-ClaimPayout.where("id < ?", Calculator.calculate_ids()) # we can pass it a method to generate criteria
-
-ClaimPayout.where("created_at > ?", 3.days.ago).pluck(:selected_payout_option).sort.uniq # useful with dates
 ```
+
+```ruby
+ClaimPayout.where("id < ?", 200).where.not(:selected_payout_option => "credit_card_transfer") # we can negate the predicate
+
+ClaimPayout.where("id < ?", DearComputer.calculate_identifiers(please: true)) # we can pass it a method to generate criteria
+
+ClaimPayout.where("created_at > ?", 3.days.ago) # we can pass dates easily
+```
+
+#### Note
+`.not` applies only to the `where` that stands right after it
 
 ---
 
@@ -138,18 +143,16 @@ ClaimPayout.where("created_at > ?", 3.days.ago).pluck(:selected_payout_option).s
 
 It is often used in `scope`s. Scopes allow to save some commonly used queries.
 
-```
+```ruby
 # https://github.com/AirHelp/ah-webapp/blob/d88b8d712ab6654ccf6292d6e1a74c0aad97f6e6/app/models/claim_enquiry_document.rb#L46-L45
 class ClaimEnquiryDocument < ApplicationRecord
   # ... some methods
   scope :assignment_form, -> { where(document_type: ASSIGNMENT_FORM) }
   # ... some other methods
 end
+
 ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT_FORM as the document_type
 ```
-
-#### Note
-`.not` applies only to the `where` that stands right after it
 
 ---
 
@@ -161,7 +164,8 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 `.pluck(:name)` - get 'name' attribute from all records in a collection 
 
 ```ruby
-ClaimPayout.where("created_at>?",3.days.ago).pluck(:selected_payout_option) # find which payout options clients used recently
+ClaimPayout.where("created_at>?",3.days.ago)
+  .pluck(:selected_payout_option).sort.uniq # find which payout options clients used recently
 ```
 
 ##### `.limit()` - retrieve only a portion of records
@@ -242,19 +246,19 @@ ActiveRecord::Base.connection.execute(sql)
 
 #### Update a single record
 
-```
+```ruby
 u = User.last
 u.update(name: 'Julia')
 ```
 is equivalent to
-```
+```ruby
 u = User.last
 u.first_name = "Julia"
 u.save
 ```
 
 We might want to reload the instance to see the changes:
-```
+```ruby
 u.reload
 ```
 
@@ -279,7 +283,7 @@ You can choose more exotic one depending on your use case (like: you need to ski
 
 ##### Example: update many records at once, skip validations & callbacks
 
-```
+```ruby
 ClaimPayout.where(selected_payout_option: 'credit_card_transfer')
   .where("created_at >= ?", 3.hour.ago)
   .update_all(payoneer_signup_complete: true)
