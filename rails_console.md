@@ -35,7 +35,7 @@ Simplest methods:
 #### `find()`
 `.find(id)` - find **one record** by id, may throw AR::RecordNotFound 
 
-```
+```ruby
 ClaimPayout.find(104980)
 ```
 
@@ -46,7 +46,7 @@ ClaimPayout.find(104980)
 `.find([id1, id2, id3])` - same as above but array passed
 
  
-```
+```ruby
 ClaimPayout.find(104980, 1)
 
 ClaimPayout.find(104980, 1, :i_am_not_here)
@@ -61,7 +61,7 @@ ClaimPayout.find(104980, 1, :i_am_not_here)
 `.find_by(name: 'Andżej')` - find **one record** by some other attribute (may return nil)
 
 
-```
+```ruby
 ClaimPayout.find_by(claim_enquiry_id: 178849,) # hey i'm a comment, and there's a comma after the id
 ```
 
@@ -110,7 +110,7 @@ It means that they can't be chained. But the methods from next slides can!
 `.where("id < ?", computed_array_of_values(some_params))` - you can interpolate argument(s) with `where` 
 
  
-```
+```ruby
 ClaimPayout.where       :selected_payout_option => "credit_card_transfer"
 
 ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_transfer"])
@@ -122,7 +122,7 @@ ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_tr
 
 `where()` returns *ActiveRecord::Relation* and can be **chained** and **negated**
 
-```
+```ruby
 Claim.where("id < ?", 9).class # Claim::ActiveRecord_Relation < ActiveRecord::Relation
 
 ClaimPayout.where("id < ?", 200).where.not(:selected_payout_option => "credit_card_transfer")
@@ -160,13 +160,13 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 ##### `.pluck()`
 `.pluck(:name)` - get 'name' attribute from all records in a collection 
 
-```
+```ruby
 ClaimPayout.where("created_at>?",3.days.ago).pluck(:selected_payout_option) # find which payout options clients used recently
 ```
 
 ##### `.limit()` - retrieve only a portion of records
 
-```
+```ruby
 ClaimPayout.where("created_at>?",3.days.ago).limit(10)
 ```
 
@@ -179,7 +179,7 @@ ClaimPayout.where("created_at>?",3.days.ago).limit(10)
 
 `.order(attribute_name: :desc)` 
 
-```
+```ruby
 ClaimPayout.where("created_at>?",3.days.ago).order(collected_at: :desc)
 ```
 
@@ -190,7 +190,7 @@ ClaimPayout.where("created_at>?",3.days.ago).order(collected_at: :desc)
 #### Querying multiple tables with `.joins()`
 
 * Use case: we need to find the number of claim payouts for the enquiries from web channel.
-```
+```ruby
 ClaimPayout.joins(:claim_enquiry).where(claim_enquiries: { channel: :ch_web }).count
 ```
 
@@ -202,7 +202,7 @@ We can use a symbol for non-spaced strings, e.g. :ch_web instead of 'ch_web'
 ## CRUD: Read
 
 * Use case: we need to find credit card payouts for the enquiries created in the last 2 weeks.
-```
+```ruby
 ClaimPayout.joins(:claim_enquiry)
   .where("claim_enquiries.created_at >= ?", 2.weeks.ago)
   .where(selected_payout_option: 'credit_card_transfer')
@@ -219,7 +219,7 @@ ClaimPayout.joins(:claim_enquiry)
 
 * Use case: we want to run a SQL query in prod, but we don't speak SQL 😔
 
-```
+```ruby
 ClaimPayout.where(selected_payout_option: 'credit_card_transfer').to_sql
 
 => "SELECT \"claim_payouts\".* FROM \"claim_payouts\" WHERE \"claim_payouts\".\"selected_payout_option\" = 'credit_card_transfer'"
@@ -231,7 +231,7 @@ ClaimPayout.where(selected_payout_option: 'credit_card_transfer').to_sql
 
 Finally, we can run arbitrary SQL with
 
-```
+```ruby
 sql = "select * from ... your sql query here"
 ActiveRecord::Base.connection.execute(sql)
 ```
@@ -243,12 +243,12 @@ ActiveRecord::Base.connection.execute(sql)
 #### Update a single record
 
 ```
-u=User.last
+u = User.last
 u.update(name: 'Julia')
 ```
 is equivalent to
 ```
-u=User.last
+u = User.last
 u.first_name = "Julia"
 u.save
 ```
@@ -263,9 +263,9 @@ u.reload
 ## CRUD: Create, Update
 
 #### Note
-These methods trigger validations, and will save the object to the database only if it is valid.
+These methods **trigger validations**, and will save the object to the database only if it is valid.
 
-The bang versions (e.g. `update!`) raise an exception if the record is invalid.
+The bang versions (e.g. `update!`) **raise an exception** if the record is invalid.
 
 There are **many other methods for updating** records. 
 
@@ -277,7 +277,7 @@ You can choose more exotic one depending on your use case (like: you need to ski
 
 ## CRUD: Create, Update
 
-#### Example: update many records at once, skip validations & callbacks
+##### Example: update many records at once, skip validations & callbacks
 
 ```
 ClaimPayout.where(selected_payout_option: 'credit_card_transfer')
@@ -289,19 +289,36 @@ ClaimPayout.where(selected_payout_option: 'credit_card_transfer')
 
 # Playing around
 
-* we can monkey-patch, the same as in plain Ruby
+* in Ruby we can `monkey-patch` - *change the original behaviour*
 ```ruby
-class Pinger
-  def ping!(patch=false)
-    # if patch
-    #   return :pong 
-    # end
-    :ping
+# app/lib/expensive_machine.rb
+# The machine that goes *ping*, original version (https://www.youtube.com/watch?v=arCITMfxvEc)
+class ExpensiveMachine
+  def ping!
+    :ping!
   end 
 end 
 
-Pinger.new.ping! # => :ping
-Pinger.new.ping!('true') # => ?
+ExpensiveMachine.new.ping! # => :ping!
+```
+
+---
+
+# Playing around
+
+```ruby
+# Paste this updated version to the rails console (or irb)
+class ExpensiveMachine
+  def ping!(patch=false)
+    if patch
+      return :pong!
+    end
+    :ping!
+  end
+end
+
+ExpensiveMachine.new.ping! # => :ping!
+ExpensiveMachine.new.ping!('true') # => :pong!
 ```
 
 ---
@@ -309,14 +326,14 @@ Pinger.new.ping!('true') # => ?
 # Playing around
 
 * we can search for methods
-```
+```ruby
 ClaimPayout.first.methods.grep /_at$/ # find 'timestamp' methods of the object, like :created_at, :collected_at, etc. 
 ```
 
 * or even display the source code
-```
-  file, line = ClaimPayout.first.method(:currency).source_location
-  y IO.readlines(file)[line-1, 10]
+```ruby
+file, line = ClaimPayout.first.method(:currency).source_location
+y IO.readlines(file)[line-1, 10]
 ```
 
 ---
@@ -334,9 +351,9 @@ def ha
 end
 ```
 
-* example: lets copy `awesome!` that AH consoles have
+* example: lets copy `awesome!` method that AirHelp consoles have
 
-We'll need to look for awesome_print in AirHelp/dockerfiles repo
+We'll need to look for `"awesome_print"` in `dockerfiles` repo
 
 ---
 
@@ -378,16 +395,35 @@ Most **readline** shortcuts are supported
 
 `$ rails console -- --nomultiline` - use `nomultiline` if you need to paste some long code #monkey-patching
 
-```reload!``` - loads latest version of code (clears monkey-patches)
+`reload!` - loads latest version of code (clears monkey-patches)
 
-```_``` - stores result of previous command
+`_` - stores result of previous command
 
-```ap Claim.last``` - pretty prints
+`ap Claim.last` - pretty prints
 
-```y Caim.last``` - "yaml" prints (display content by serializing it to YAML)
+`y Caim.last` - "yaml" prints (display content by serializing it to YAML)
 
-```ActiveRecord::Base.connection.tables ``` - list all tables in application
+`ActiveRecord::Base.connection.tables` - list all tables in application
 
+---
+
+# Tips 
+
+Rails console uses `irb` by default https://github.com/ruby/irb
+
+Try `pry` https://github.com/pry/pry 
+
+```ruby
+# Gemfile
+gem 'pry-rails', :group => :development
+```
+
+* Source code browsing (including core C source with the pry-doc gem), documentation browsing
+* Navigation around state (cd, ls and friends)
+* Open methods in editors (edit-method Class#method)
+* Command shell integration (start editors, run git, and rake from within Pry), gist integration
+* Runtime invocation (use Pry as a developer console or debugger)
+* Ability to view and replay history, and many, many more...
 
 ---
 
