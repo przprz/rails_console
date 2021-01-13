@@ -2,17 +2,6 @@
 github.com/przprz/rails_console
 
 ---
-
-## TOC
-
-* Basic CRUD operations
-* Monkey-patching
-* Configuration
-* Keyboard shortcuts
-* Tips
-* Links
-
----
 A quote from [official documentation][1]:
 
 
@@ -33,6 +22,18 @@ This is useful for
 
 
 [1]: https://guides.rubyonrails.org/command_line.html#bin-rails-console
+
+---
+
+## TOC
+
+* Basic CRUD operations
+* Monkey-patching
+* Configuration
+* Keyboard shortcuts
+* Tips
+* Links
+
 ---
 
 # Create, Read, Update, Delete (CRUD) operations
@@ -300,7 +301,7 @@ You can choose more exotic one depending on your use case (like: you need to ski
 
 ## CRUD: Create, Update
 
-##### Example: update many records at once, skip validations & callbacks
+###### Example: update many records at once, skip validations & callbacks
 
 ```ruby
 ClaimPayout.where(selected_payout_option: 'credit_card_transfer')
@@ -384,7 +385,7 @@ We'll need to look for `"awesome_print"` in `dockerfiles` repo
 
 # Keyboard shortcuts
 
-Most **readline** shortcuts are supported
+Most [**readline**][2] shortcuts are supported
 ###### TIP: many other applications also support some of these (try in your browser)
 
 * tab - autocompletion
@@ -400,6 +401,8 @@ Most **readline** shortcuts are supported
 * ctrl+b/ctrl+f - go to previous/next character
 
 * ctrl+w/alt+d - delete previous/next word
+
+[2]: https://en.wikipedia.org/wiki/GNU_Readline#Emacs_keyboard_shortcuts
 ---
 
 # Keyboard shortcuts
