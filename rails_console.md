@@ -376,7 +376,7 @@ def ha
 end
 ```
 
-* example: lets look how `awesome!` method is implemented
+* example: lets see how `awesome!` method is implemented
 
 We'll need to look for `"awesome_print"` in `dockerfiles` repo
 
