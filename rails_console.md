@@ -5,7 +5,7 @@ github.com/przprz/rails_console
 
 ## TOC
 
-* CRUD operations
+* Basic CRUD operations
 * Monkey-patching
 * Configuration
 * Keyboard shortcuts
@@ -13,12 +13,32 @@ github.com/przprz/rails_console
 * Links
 
 ---
+A quote from [official documentation][1]:
+
+
+
+The `console` command lets you 
+
+**interact with your Rails application**
+
+**from the command line**.
+
+
+
+This is useful for 
+
+**testing out quick ideas** with code and 
+
+**changing data server-side without touching the website**.
+
+
+[1]: https://guides.rubyonrails.org/command_line.html#bin-rails-console
+---
 
 # Create, Read, Update, Delete (CRUD) operations
 * comprehensive documentation: https://guides.rubyonrails.org/active_record_querying.html
 
-## CRUD: Read 
-Simplest methods:
+## CRUD: Read - simple methods:
 
 `.first`,
 `.second`,
@@ -30,9 +50,8 @@ Simplest methods:
 
 ---
 
-## CRUD: Read 
+## CRUD: Read - `find()`
 
-#### `find()`
 `.find(id)` - find **one record** by id, may throw AR::RecordNotFound 
 
 ```ruby
@@ -43,7 +62,7 @@ ClaimPayout.find(104980)
 
 `.find(id1, id2, id3,)` - find **many records**, also may throw AR::RecordNotFound 
 
-`.find([id1, id2, id3])` - same as above but array passed
+`.find([id1, id2, id3])` - same as above
 
  
 ```ruby
@@ -55,9 +74,8 @@ ClaimPayout.find(104980, 1, :i_am_not_here)
 
 ---
 
-## CRUD: Read 
+## CRUD: Read - `find_by()`
 
-#### `find_by()`
 `.find_by(name: 'Andżej')` - find **one record** by some other attribute (may return nil)
 
 
@@ -97,17 +115,17 @@ It means that they can't be chained. But the methods from next slides can!
 
 ---
 
-## CRUD: Read 
+## CRUD: Read - `where()`
 
-#### `where()`
+`.where(city: 'Pszczyna')` - finds **many records** (caution - output may be long)
 
-`.where(city: 'Ulaanbaatar')` - finds **many records** (watch out - may return loooooong output)
+`.where(continent: 'Africa', hemisphere: 'southern')` - can be used with many attributes
 
-`.where(continent: 'Africa', hemisphere: 'southern')` - `where` can be used with many attributes
+`.where(gender: %w[ L G B T Q H ])` - can be used with array of values
 
-`.where(gender: %w[ L G B T Q H ])` - `where` can be used with array of values
+`.where(created_at: 2.weeks.ago..1.day.ago)` - can be used with a `Range`
 
-`.where("id < ?", computed_array_of_values(some_params))` - you can **interpolate argument(s)** with `where` 
+`.where("id < ?", computed_array_of_values(some_params))` - you can **interpolate argument(s)** (`?` is a placeholder here)
 
  
 ```ruby
@@ -118,7 +136,7 @@ ClaimPayout.where(selected_payout_option: ["credit_card_transfer", "free_bank_tr
 
 ---
 
-## CRUD: Read 
+## CRUD: Read - `where()`
 
 `where()` returns *ActiveRecord::Relation* and can be **chained** and **negated**
 
@@ -139,7 +157,7 @@ ClaimPayout.where("created_at > ?", 3.days.ago) # we can pass dates easily
 
 ---
 
-## CRUD: Read
+## CRUD: Read - `where()`
 
 It is often used in `scope`s. Scopes allow to save some commonly used queries.
 
@@ -156,12 +174,9 @@ ClaimEnquiryDocument.assignment_form # find ClaimEnquiryDocument with ASSIGNMENT
 
 ---
 
-## CRUD: Read
+## CRUD: Read - some other useful methods
 
-#### Other useful methods
-
-##### `.pluck()`
-`.pluck(:name)` - get 'name' attribute from all records in a collection 
+##### `.pluck(:name)` - get 'name' attribute from all records in a collection 
 
 ```ruby
 ClaimPayout.where("created_at>?", 3.days.ago)
@@ -174,9 +189,15 @@ ClaimPayout.where("created_at>?", 3.days.ago)
 ClaimPayout.where("created_at>?", 3.days.ago).limit(10)
 ```
 
+##### `.group()` - group by selected attribute
+
+```ruby
+ClaimPayout.group(:selected_payout_option).count
+```
+
 ---
 
-## CRUD: Read
+## CRUD: Read - some other useful methods
 
 ##### `.order()`
 `.order(:attribute_name)`  is equivalent to `.order(attribute_name: :asc)`
@@ -189,9 +210,7 @@ ClaimPayout.where("created_at>?", 3.days.ago).order(collected_at: :desc)
 
 ---
 
-## CRUD: Read
-
-#### Querying multiple tables with `.joins()`
+## CRUD: Read - querying multiple tables with `.joins()`
 
 * Use case: we need to find the number of claim payouts for the enquiries from web channel.
 ```ruby
@@ -203,7 +222,7 @@ We can use a symbol for non-spaced strings, e.g. :ch_web instead of 'ch_web'
 
 ---
 
-## CRUD: Read
+## CRUD: Read - querying multiple tables with `.joins()`
 
 * Use case: we need to find credit card payouts for the enquiries created in the last 2 weeks.
 ```ruby
@@ -217,7 +236,7 @@ ClaimPayout.joins(:claim_enquiry)
 
 ---
 
-## CRUD: Read
+## CRUD: Read - `.to_sql()`
 
 `to_sql()` - turn the AR query into a SQL query
 
@@ -231,7 +250,7 @@ ClaimPayout.where(selected_payout_option: 'credit_card_transfer').to_sql
 
 ---
 
-## CRUD: Read
+## CRUD: Read - arbitrary sql
 
 Finally, we can run arbitrary SQL with
 
@@ -340,6 +359,8 @@ file, line = ClaimPayout.first.method(:currency).source_location
 y IO.readlines(file)[line-1, 10]
 ```
 
+Note: the above is much easier with `pry-rails`'s `show-method`
+
 ---
 
 # Configuration
@@ -355,7 +376,7 @@ def ha
 end
 ```
 
-* example: lets copy `awesome!` method that AirHelp consoles have
+* example: lets look how `awesome!` method is implemented
 
 We'll need to look for `"awesome_print"` in `dockerfiles` repo
 
@@ -406,6 +427,8 @@ Most **readline** shortcuts are supported
 `ap Claim.last` - pretty prints
 
 `y Caim.last` - "yaml" prints (display content by serializing it to YAML)
+
+`.cat ~/.irbrc` - you can invoke shell commands - just prepend them with `.`
 
 `ActiveRecord::Base.connection.tables` - list all tables in application
 
